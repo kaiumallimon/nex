@@ -26,7 +26,7 @@ A modern Flutter-based AI chatbot application that provides a ChatGPT-like exper
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/nex.git
+git clone https://github.com/kaiumallimon/nex.git
 ```
 
 2. Navigate to the project directory:
@@ -44,15 +44,6 @@ flutter pub get
 flutter run
 ```
 
-## 🔧 Configuration
-
-1. Set up your AI service API keys in `lib/app/constants/api_constants.dart`
-2. Configure Firebase for authentication (if using Firebase)
-3. Update theme configurations in `lib/app/views/themes/`
-
-## 📱 Screenshots
-
-[Add your app screenshots here]
 
 ## 🤝 Contributing
 
@@ -68,7 +59,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Authors
 
-- Your Name - Initial work
+- Kaium Al Limon - Initial work
 
 ## 🙏 Acknowledgments
 
