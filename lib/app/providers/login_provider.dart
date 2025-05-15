@@ -1,40 +1,77 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:hive/hive.dart';
+import 'package:nex/app/services/login_service.dart';
+import 'package:nex/app/views/pages/login_page.dart';
+import 'package:nex/app/views/pages/register_page.dart';
+import 'package:nex/app/views/pages/wrapper_page.dart';
+import 'package:nex/app/views/widgets/custom_dialog.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginProvider extends ChangeNotifier {
-  bool isLoading = false;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final LoginService loginService = LoginService();
 
-  void login(BuildContext context) {
+  bool isLoading = false;
+
+  Future<void> login(BuildContext context) async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder:
-            (context) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              title: Text('Error'),
-              content: Text('Please enter email and password'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    'OK',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).primaryColorDark,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-      );
+      customDialog(context, 'Error', 'Please fill all the fields');
     }
 
     isLoading = true;
+    notifyListeners();
+    try {
+      final response = await loginService.login(
+        emailController.text,
+        passwordController.text,
+      );
+
+      if (response['success']) {
+        await Hive.openBox('user');
+        await Hive.box('user').put('userProfile', response['userProfile']);
+
+        if (context.mounted) {
+          Navigator.pushReplacement(
+            context,
+            CupertinoPageRoute(builder: (context) => const WrapperPage()),
+          );
+        }
+      } else {
+        if (context.mounted) {
+          customDialog(context, 'Error', response['message']);
+        }
+      }
+    } catch (error) {
+      isLoading = false;
+      notifyListeners();
+      if (context.mounted) {
+        customDialog(context, 'Error', error.toString());
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void goToRegisterPage(BuildContext context) {
+    if (context.mounted) {
+      Navigator.push(
+        context,
+        CupertinoPageRoute(builder: (context) => const RegisterPage()),
+      );
+    }
+  }
+
+  Future<void> logout(BuildContext context) async {
+    Supabase.instance.client.auth.signOut();
+    await Hive.openBox('user');
+    await Hive.box('user').clear();
+    if (context.mounted) {
+      Navigator.pushReplacement(
+        context,
+        CupertinoPageRoute(builder: (context) => const LoginPage()),
+      );
+    }
   }
 }
