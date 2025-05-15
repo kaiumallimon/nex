@@ -17,6 +17,7 @@ A modern Flutter-based AI chatbot application that provides a ChatGPT-like exper
   <img src="demo_images/splash.png" alt="Splash Screen" width="250"/>
   <img src="demo_images/login.png" alt="Login Screen" width="250"/>
   <img src="demo_images/register.png" alt="Register Screen" width="250"/>
+  <img src="demo_images/conversations.png" alt="Conversations Screen" width="250"/>
 </div>
 
 ## 🚀 Getting Started
