@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:nex/app/providers/chat_provider.dart';
 import 'package:nex/app/providers/conversation_provider.dart';
 import 'package:nex/app/providers/login_provider.dart';
 import 'package:nex/app/providers/register_provider.dart';
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => RegisterProvider()),
         ChangeNotifierProvider(create: (context) => ConversationProvider()),
         ChangeNotifierProvider(create: (context) => WrapperProvider()),
+        ChangeNotifierProvider(create: (context) => ChatProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

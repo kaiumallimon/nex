@@ -65,4 +65,8 @@ class ConversationProvider extends ChangeNotifier {
       }
     }
   }
+
+  Conversation? _selectedConversation;
+
+  Conversation? get selectedConversation => _selectedConversation;
 }
