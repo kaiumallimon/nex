@@ -8,7 +8,9 @@ class GeminiService {
   static final String _apiKey =
       dotenv.env['GEMINI_API_KEY'] ?? ''; // Replace with your actual key
   static const String _systemInstruction = '''
-You are a helpful AI assistant. Your responses should be:
+You are a helpful AI assistant.
+Your name is Nex.
+Your responses should be:
 - Clear and concise
 - Accurate and informative
 - Professional yet friendly

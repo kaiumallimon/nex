@@ -8,7 +8,8 @@ class ConversationService {
       final conversationResponse = await Supabase.instance.client
           .from('conversations')
           .select()
-          .eq('user_id', userId);
+          .eq('user_id', userId)
+          .order('updated_at', ascending: false);
 
       // parse to the model:
       final conversations =
@@ -31,11 +32,31 @@ class ConversationService {
     try {
       final conversationResponse = await Supabase.instance.client
           .from('conversations')
-          .insert(conversation.toJson());
+          .insert(conversation.toJson())
+          .select();
 
       return {
         'success': true,
         'message': 'Conversation created successfully',
+        'data': conversationResponse,
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  // update conversation
+  Future<Map<String, dynamic>> updateConversation(Conversation conversation) async {
+    try {
+      final conversationResponse = await Supabase.instance.client
+          .from('conversations')
+          .update(conversation.toJson())
+          .eq('id', conversation.id)
+          .select();
+
+      return {
+        'success': true,
+        'message': 'Conversation updated successfully',
         'data': conversationResponse,
       };
     } catch (e) {

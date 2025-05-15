@@ -54,12 +54,13 @@ class ConversationProvider extends ChangeNotifier {
   Future<void> fetchProfileData(BuildContext context) async {
     try {
       final profileBox = await Hive.openBox('user');
-      // final profile = profileBox.get('user');
-      _profile = Profile.fromJson(profileBox.get('userProfile'));
-
-      notifyListeners();
+      final userProfile = profileBox.get('userProfile');
+      
+      if (userProfile != null) {
+        _profile = Profile.fromJson(userProfile);
+        notifyListeners();
+      }
     } on Exception catch (e) {
-      // TODO
       if (context.mounted) {
         customDialog(context, "Error", e.toString());
       }
@@ -69,4 +70,11 @@ class ConversationProvider extends ChangeNotifier {
   Conversation? _selectedConversation;
 
   Conversation? get selectedConversation => _selectedConversation;
+
+  void addConversation(Conversation conversation) {
+    _conversations.add(conversation);
+    // sort by createdAt descending
+    _conversations.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    notifyListeners();
+  }
 }

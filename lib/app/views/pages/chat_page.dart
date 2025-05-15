@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:nex/app/providers/chat_provider.dart';
+import 'package:nex/app/providers/wrapper_provider.dart';
 import 'package:nex/app/views/widgets/app_logo.dart';
 import 'package:provider/provider.dart';
 
@@ -23,15 +24,13 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
@@ -40,7 +39,9 @@ class _ChatPageState extends State<ChatPage> {
 
     // Listen to messages changes and scroll to bottom
     if (chatProvider.messages.isNotEmpty) {
-      _scrollToBottom();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottom();
+      });
     }
 
     return Scaffold(
@@ -57,7 +58,12 @@ class _ChatPageState extends State<ChatPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Provider.of<WrapperProvider>(
+                        context,
+                        listen: false,
+                      ).setCurrentIndex(1);
+                    },
                     icon: Icon(
                       Icons.menu,
                       color: Theme.of(context).primaryColor,
@@ -81,11 +87,50 @@ class _ChatPageState extends State<ChatPage> {
             Expanded(
               child: Consumer<ChatProvider>(
                 builder: (context, chatProvider, child) {
+                  if (chatProvider.messages.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'What can I help with?',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.titleLarge?.copyWith(
+                              color: Theme.of(context).shadowColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * .8,
+                            child: Text(
+                              'I can help you with your questions and concerns. Ask me anything, I\'m here to help! ',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).dividerColor.withOpacity(.8),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
                   return ListView.builder(
                     controller: _scrollController,
                     physics: const BouncingScrollPhysics(),
                     itemCount: chatProvider.messages.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.only(
+                      left: 20,
+                      right: 20,
+                      bottom: 20,
+                      top: 10,
+                    ),
                     itemBuilder: (context, index) {
                       final message = chatProvider.messages[index];
 
@@ -119,8 +164,46 @@ class _ChatPageState extends State<ChatPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               message.sender == 'model'
-                              ? MarkdownBody(data: message.content)
-                              : Text(message.content),
+                                  ? MarkdownBody(
+                                    data: message.content,
+                                    styleSheet: MarkdownStyleSheet(
+                                      p: Theme.of(context).textTheme.bodyMedium,
+                                      code: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium?.copyWith(
+                                        // backgroundColor: Theme.of(context).splashColor,
+                                        fontFamily: 'monospace',
+                                      ),
+                                      codeblockDecoration: BoxDecoration(
+                                        color: Theme.of(context).splashColor,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      codeblockPadding: const EdgeInsets.all(8),
+                                      blockquote: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium?.copyWith(
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.color
+                                            ?.withOpacity(0.8),
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                      blockquoteDecoration: BoxDecoration(
+                                        border: Border(
+                                          left: BorderSide(
+                                            color:
+                                                Theme.of(context).dividerColor,
+                                            width: 4,
+                                          ),
+                                        ),
+                                      ),
+                                      blockquotePadding: const EdgeInsets.only(
+                                        left: 16,
+                                      ),
+                                    ),
+                                  )
+                                  : Text(message.content),
                             ],
                           ),
                         ),
@@ -179,11 +262,12 @@ class _ChatPageState extends State<ChatPage> {
                     readOnly: chatProvider.isSending,
                     expands: false,
                     maxLines: null,
-                    onSubmitted: chatProvider.isSending
-                        ? null
-                        : (_) async {
-                            await chatProvider.sendMessage(context);
-                          },
+                    onSubmitted:
+                        chatProvider.isSending
+                            ? null
+                            : (_) async {
+                              await chatProvider.sendMessage(context);
+                            },
                     decoration: InputDecoration(
                       hintText: 'Type a message',
                       hintStyle: Theme.of(context).textTheme.bodyMedium,
@@ -250,11 +334,14 @@ class _ChatPageState extends State<ChatPage> {
                             ? CupertinoActivityIndicator(
                               color: Theme.of(context).primaryColor,
                             )
-                            : const Icon(Icons.arrow_upward, color: Colors.white),
+                            : const Icon(
+                              Icons.arrow_upward,
+                              color: Colors.white,
+                            ),
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(
                         chatProvider.isSending
-                            ? Theme.of(context).disabledColor
+                            ? Theme.of(context).splashColor
                             : Theme.of(context).primaryColor,
                       ),
                       shape: MaterialStateProperty.all(const CircleBorder()),

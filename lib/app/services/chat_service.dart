@@ -7,7 +7,8 @@ class ChatService {
     try {
       var response = await Supabase.instance.client
           .from('messages')
-          .insert(message.toJson());
+          .insert(message.toJson())
+          .select();
 
       debugPrint(response.toString());
 
@@ -18,6 +19,29 @@ class ChatService {
       };
     } catch (e) {
       return {'success': false, 'message': "Error storing message in storeMessageInDatabase ${e.toString()}"};
+    }
+  }
+
+  Future<Map<String, dynamic>> getMessages(String conversationId) async {
+    try {
+      final response = await Supabase.instance.client
+          .from('messages')
+          .select()
+          .eq('conversation_id', conversationId)
+          .order('created_at', ascending: true);
+
+      final messages = (response as List).map((json) => Message.fromJson(json)).toList();
+
+      return {
+        'success': true,
+        'message': 'Messages fetched successfully',
+        'data': messages,
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error fetching messages: ${e.toString()}',
+      };
     }
   }
 }

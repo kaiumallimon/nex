@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nex/app/providers/chat_provider.dart';
 import 'package:nex/app/providers/conversation_provider.dart';
+import 'package:nex/app/providers/login_provider.dart';
 import 'package:nex/app/providers/wrapper_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -12,10 +14,7 @@ class ConversationsPage extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          right: BorderSide(
-            color: Theme.of(context).splashColor,
-            width: 2,
-          ),
+          right: BorderSide(color: Theme.of(context).splashColor, width: 2),
         ),
       ),
       child: Scaffold(
@@ -24,13 +23,15 @@ class ConversationsPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-      
+
               /// search bar and new chat button
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 20,
                   children: [
                     Expanded(
                       child: SizedBox(
@@ -41,9 +42,11 @@ class ConversationsPage extends StatelessWidget {
                             fillColor: Theme.of(context).splashColor,
                             border: InputBorder.none,
                             hintText: 'Search',
-                            contentPadding: EdgeInsets.symmetric(vertical: 12),
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 12,
+                            ),
                             focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 width: 0,
                                 color: Colors.transparent,
                               ),
@@ -51,21 +54,23 @@ class ConversationsPage extends StatelessWidget {
                               gapPadding: 0,
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 width: 0,
                                 color: Colors.transparent,
                               ),
                               borderRadius: BorderRadius.circular(10),
                               gapPadding: 0,
                             ),
-      
-                            prefixIcon: Icon(Icons.search),
+
+                            prefixIcon: const Icon(Icons.search),
                           ),
                         ),
                       ),
                     ),
                     IconButton(
                       onPressed: () {
+                        // Clear current conversation when starting new chat
+                        context.read<ChatProvider>().clearCurrentConversation();
                         context.read<WrapperProvider>().setCurrentIndex(1);
                       },
                       icon: Icon(
@@ -77,7 +82,7 @@ class ConversationsPage extends StatelessWidget {
                   ],
                 ),
               ),
-      
+
               /// chats placeholder
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -89,16 +94,21 @@ class ConversationsPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-      
+
               /// Conversations list:
               Expanded(
-                child: Consumer<ConversationProvider>(
-                  builder: (context, conversationProvider, child) {
+                child: Consumer2<ConversationProvider, ChatProvider>(
+                  builder: (
+                    context,
+                    conversationProvider,
+                    chatProvider,
+                    child,
+                  ) {
                     // Call fetch once here
                     Future.microtask(
                       () => conversationProvider.fetchConversations(context),
                     );
-      
+
                     return conversationProvider.isLoading
                         ? Center(
                           child: CupertinoActivityIndicator(
@@ -111,19 +121,35 @@ class ConversationsPage extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final convo =
                                 conversationProvider.conversations[index];
+                            final isSelected =
+                                chatProvider.currentConversation?.id ==
+                                convo.id;
+
                             return InkWell(
-                              onTap: () {},
+                              onTap: () {
+                                chatProvider.setCurrentConversation(
+                                  convo,
+                                  context,
+                                );
+                                context.read<WrapperProvider>().setCurrentIndex(
+                                  0,
+                                );
+                              },
                               child: Container(
-                                padding: EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                   vertical: 15,
                                   horizontal: 20,
                                 ),
-                                margin: EdgeInsets.only(bottom: 5),
-                                // decoration: BoxDecoration(
-                                //   color: Theme.of(context).primaryColorLight,
-                                // ),
+                                margin: const EdgeInsets.only(bottom: 5),
+                                decoration: BoxDecoration(
+                                  color:
+                                      isSelected
+                                          ? Theme.of(
+                                            context,
+                                          ).primaryColor.withOpacity(0.1)
+                                          : null,
+                                ),
                                 child: Row(
-                                  spacing: 20,
                                   children: [
                                     Expanded(
                                       child: Text(
@@ -136,7 +162,7 @@ class ConversationsPage extends StatelessWidget {
                                             ).textTheme.titleMedium,
                                       ),
                                     ),
-                                    Icon(Icons.chevron_right, size: 20),
+                                    const Icon(Icons.chevron_right, size: 20),
                                   ],
                                 ),
                               ),
@@ -146,18 +172,21 @@ class ConversationsPage extends StatelessWidget {
                   },
                 ),
               ),
-      
+
               /// Profile section:
               Consumer<ConversationProvider>(
                 builder: (context, conversationProvider, child) {
                   Future.microtask(
                     () => conversationProvider.fetchProfileData(context),
                   );
-      
+
                   final profile = conversationProvider.profile;
-      
+
                   return Container(
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 15,
+                      horizontal: 20,
+                    ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.surface,
                       border: Border(
@@ -171,20 +200,17 @@ class ConversationsPage extends StatelessWidget {
                           color: Colors.grey.withOpacity(0.2),
                           blurRadius: 10,
                           spreadRadius: 0,
-                          offset: Offset(
-                            0,
-                            -4,
-                          ), // Negative Y => shadow at top only
+                          offset: const Offset(0, -4),
                         ),
                       ],
                     ),
-      
+
                     child: Row(
                       children: [
                         CircleAvatar(
                           radius: 20,
                           backgroundColor: Theme.of(context).primaryColorLight,
-                          child: Icon(Icons.person, size: 20),
+                          child: const Icon(Icons.person, size: 20),
                         ),
                         const SizedBox(width: 20),
                         Expanded(
@@ -207,7 +233,49 @@ class ConversationsPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 20),
-                        Icon(Icons.chevron_right, size: 20),
+                        IconButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => AlertDialog(
+                                title: Text('Logout'),
+                                content: Text('Are you sure you want to logout?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text(
+                                      'Cancel',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(color: Colors.black),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Provider.of<LoginProvider>(context, listen: false).logout(context);
+                                    },
+                                    child: Text(
+                                      'Logout',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            Icons.logout,
+                            size: 25,
+                            color: Colors.red,
+                          ),
+                        ),
                       ],
                     ),
                   );
