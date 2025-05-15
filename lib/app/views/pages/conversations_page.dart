@@ -64,7 +64,9 @@ class ConversationsPage extends StatelessWidget {
                             prefixIcon: const Icon(Icons.search),
                           ),
                           onChanged: (value) {
-                            context.read<ConversationProvider>().updateSearchQuery(value);
+                            context
+                                .read<ConversationProvider>()
+                                .updateSearchQuery(value);
                           },
                         ),
                       ),
@@ -73,7 +75,7 @@ class ConversationsPage extends StatelessWidget {
                       onPressed: () {
                         // Clear current conversation when starting new chat
                         context.read<ChatProvider>().clearCurrentConversation();
-                        context.read<WrapperProvider>().setCurrentIndex(1);
+                        // context.read<WrapperProvider>().setCurrentIndex(1);
                       },
                       icon: Icon(
                         Icons.add_circle,
@@ -118,11 +120,15 @@ class ConversationsPage extends StatelessWidget {
                             color: Theme.of(context).primaryColor,
                           ),
                         )
+                        : conversationProvider.conversations.isEmpty
+                        ? Center(child: Text('No previous chat history.'))
                         : ListView.builder(
-                          itemCount: conversationProvider.filteredConversations.length,
+                          itemCount:
+                              conversationProvider.filteredConversations.length,
                           itemBuilder: (context, index) {
                             final convo =
-                                conversationProvider.filteredConversations[index];
+                                conversationProvider
+                                    .filteredConversations[index];
                             final isSelected =
                                 chatProvider.currentConversation?.id ==
                                 convo.id;
@@ -240,43 +246,45 @@ class ConversationsPage extends StatelessWidget {
                             showDialog(
                               context: context,
                               barrierDismissible: false,
-                              builder: (context) => AlertDialog(
-                                title: Text('Logout'),
-                                content: Text('Are you sure you want to logout?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text(
-                                      'Cancel',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.copyWith(color: Colors.black),
+                              builder:
+                                  (context) => AlertDialog(
+                                    title: Text('Logout'),
+                                    content: Text(
+                                      'Are you sure you want to logout?',
                                     ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text(
+                                          'Cancel',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(color: Colors.black),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Provider.of<LoginProvider>(
+                                            context,
+                                            listen: false,
+                                          ).logout(context);
+                                        },
+                                        child: Text(
+                                          'Logout',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Provider.of<LoginProvider>(context, listen: false).logout(context);
-                                    },
-                                    child: Text(
-                                      'Logout',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.copyWith(color: Colors.red),
-                                    ),
-                                  ),
-                                ],
-                              ),
                             );
                           },
-                          icon: Icon(
-                            Icons.logout,
-                            size: 25,
-                            color: Colors.red,
-                          ),
+                          icon: Icon(Icons.logout, size: 25, color: Colors.red),
                         ),
                       ],
                     ),

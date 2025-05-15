@@ -95,6 +95,22 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void reset() {
+    _messages = [];
+    _chatHistory = [];
+    _currentConversation = null;
+    _isSending = false;
+    messageController.clear();
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    messageController.dispose();
+    reset();
+    super.dispose();
+  }
+
   // Load messages for current conversation
   Future<void> loadMessages(BuildContext context) async {
     if (_currentConversation == null) {

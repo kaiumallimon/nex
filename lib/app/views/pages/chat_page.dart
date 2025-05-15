@@ -57,18 +57,18 @@ class _ChatPageState extends State<ChatPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    onPressed: () {
-                      Provider.of<WrapperProvider>(
-                        context,
-                        listen: false,
-                      ).setCurrentIndex(1);
-                    },
-                    icon: Icon(
-                      Icons.menu,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
+                  // IconButton(
+                  //   onPressed: () {
+                  //     Provider.of<WrapperProvider>(
+                  //       context,
+                  //       listen: false,
+                  //     ).setCurrentIndex(1);
+                  //   },
+                  //   icon: Icon(
+                  //     Icons.menu,
+                  //     color: Theme.of(context).primaryColor,
+                  //   ),
+                  // ),
 
                   AppLogo(
                     primary: Colors.black,

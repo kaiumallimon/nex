@@ -92,4 +92,20 @@ class ConversationProvider extends ChangeNotifier {
     _conversations.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     notifyListeners();
   }
+
+  void reset() {
+    _conversations = [];
+    _isLoading = false;
+    _isInitialized = false;
+    _searchQuery = '';
+    _profile = null;
+    _selectedConversation = null;
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    reset();
+    super.dispose();
+  }
 }
