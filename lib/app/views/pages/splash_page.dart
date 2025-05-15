@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nex/app/providers/splash_provider.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,15 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Theme.of(context).colorScheme.surface,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: Theme.of(context).colorScheme.surface,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+    );
+
     // get provider
     final splashProvider = Provider.of<SplashProvider>(context);
 

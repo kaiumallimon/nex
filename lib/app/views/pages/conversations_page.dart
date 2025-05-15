@@ -61,9 +61,11 @@ class ConversationsPage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                               gapPadding: 0,
                             ),
-
                             prefixIcon: const Icon(Icons.search),
                           ),
+                          onChanged: (value) {
+                            context.read<ConversationProvider>().updateSearchQuery(value);
+                          },
                         ),
                       ),
                     ),
@@ -117,10 +119,10 @@ class ConversationsPage extends StatelessWidget {
                           ),
                         )
                         : ListView.builder(
-                          itemCount: conversationProvider.conversations.length,
+                          itemCount: conversationProvider.filteredConversations.length,
                           itemBuilder: (context, index) {
                             final convo =
-                                conversationProvider.conversations[index];
+                                conversationProvider.filteredConversations[index];
                             final isSelected =
                                 chatProvider.currentConversation?.id ==
                                 convo.id;

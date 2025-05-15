@@ -11,10 +11,25 @@ class ConversationProvider extends ChangeNotifier {
 
   List<Conversation> _conversations = [];
   bool _isLoading = false;
-  bool _isInitialized = false; // NEW
+  bool _isInitialized = false;
+  String _searchQuery = '';
 
   List<Conversation> get conversations => _conversations;
   bool get isLoading => _isLoading;
+  String get searchQuery => _searchQuery;
+
+  // Filtered conversations based on search query
+  List<Conversation> get filteredConversations {
+    if (_searchQuery.isEmpty) return _conversations;
+    return _conversations.where((conversation) =>
+        conversation.title.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+  }
+
+  // Method to update search query
+  void updateSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
 
   Future<void> fetchConversations(BuildContext context) async {
     if (_isInitialized) return; // prevent re-fetching
