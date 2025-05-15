@@ -31,6 +31,10 @@ class LoginProvider extends ChangeNotifier {
         await Hive.openBox('user');
         await Hive.box('user').put('userProfile', response['userProfile']);
 
+        clearFields();
+        isLoading = false;
+        notifyListeners();
+
         if (context.mounted) {
           Navigator.pushReplacement(
             context,
@@ -73,5 +77,10 @@ class LoginProvider extends ChangeNotifier {
         CupertinoPageRoute(builder: (context) => const LoginPage()),
       );
     }
+  }
+
+  void clearFields() {
+    emailController.clear();
+    passwordController.clear();
   }
 }
