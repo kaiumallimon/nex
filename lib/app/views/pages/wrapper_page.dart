@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nex/app/providers/login_provider.dart';
+import 'package:nex/app/providers/wrapper_provider.dart';
+import 'package:nex/app/views/pages/conversations_page.dart';
 import 'package:provider/provider.dart';
 
 class WrapperPage extends StatelessWidget {
@@ -7,25 +9,26 @@ class WrapperPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loginProvider = Provider.of<LoginProvider>(context);
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Nex'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Hello, World!'),
-            TextButton(
-              onPressed: () {
-                loginProvider.logout(context);
-              },
-              child: Text('Logout'),
-            ),
-          ],
-        ),
+      body: Consumer<WrapperProvider>(
+        builder: (context, wrapperProvider, child) {
+          return PageView(
+            physics: BouncingScrollPhysics(),
+            controller: wrapperProvider.pageController,
+            // reverse: true,
+            scrollDirection: Axis.horizontal,
+            children: [
+              // conversations list page
+              ConversationsPage(),
+
+              // chat page
+              Scaffold(
+                appBar: AppBar(title: Text('Chat')),
+                body: Column(children: [Text('Chat')]),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
