@@ -1,5 +1,7 @@
 # Nex - AI Chatbot Application
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## Overview
 Nex is a modern AI chatbot application built with Flutter, offering a ChatGPT-like experience. It provides an intuitive interface for AI-powered conversations, backed by Supabase for user management and Hive for local storage. The application implements a clean architecture pattern and uses Provider for state management.
 
@@ -78,7 +80,7 @@ lib/
 ### Setup
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/nex.git
+git clone https://github.com/kaiumallimon/nex.git
 cd nex
 ```
 
@@ -86,7 +88,7 @@ cd nex
 ```
 SUPABASE_URL=your_supabase_url
 SUPABASE_KEY=your_supabase_anon_key
-AI_API_KEY=your_ai_api_key
+GEMINI_API_KEY=your_ai_api_key
 ```
 
 3. Install dependencies
@@ -127,7 +129,7 @@ The application uses Provider for state management with the following main provi
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. The MIT License is a permissive license that allows you to do anything you want with the code as long as you provide attribution back to the author and don't hold them liable.
 
 ## Contact
 For any queries or suggestions, please open an issue in the repository.
